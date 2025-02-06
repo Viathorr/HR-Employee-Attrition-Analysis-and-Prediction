@@ -26,7 +26,7 @@ def get_cols_names(df: pd.DataFrame, cat_threshold: int = 10, car_threshold: int
   cat_cols = df.select_dtypes(include=["object"]).columns.tolist()
   num_cols = df.select_dtypes(exclude=["object"]).columns.tolist()
   cat_but_car_cols = [col for col in cat_cols if df[col].nunique() > car_threshold]
-  num_but_cat_cols = [col for col in num_cols if df[col].nunique() < cat_threshold]
+  num_but_cat_cols = [col for col in num_cols if df[col].nunique() <= cat_threshold]
 
   # Combining categorical features and excluding categorical but cardinal features
   cat_cols += num_but_cat_cols
@@ -53,11 +53,11 @@ def print_cols_summary(df: pd.DataFrame, cat_cols, num_cols, num_but_cat_cols=No
     cat_but_car_cols : list, optional
         List of categorical but cardinal columns, by default None.
     """
-    print(f"Categorical columns (including numeric-looking categorical columns): {cat_cols}\n\nFrom them numeric-looking categorical columns: {num_but_cat_cols}\n")
+    print(f"Categorical columns ({len(cat_cols)}) (including numeric-looking categorical columns): {cat_cols}\n\nFrom them numeric-looking categorical columns ({len(num_but_cat_cols)}): {num_but_cat_cols}\n")
     print("-" * 50)
-    print(f"\nNumeric columns: {num_cols}\n")
+    print(f"\nNumeric columns ({len(num_cols)}): {num_cols}\n")
     print("-" * 50)
-    print(f"\nCategorical but cardinal columns: {cat_but_car_cols}\n")
+    print(f"\nCategorical but cardinal columns ({len(cat_but_car_cols)}): {cat_but_car_cols}\n")
     print("-" * 50)
 
     for col in cat_cols:

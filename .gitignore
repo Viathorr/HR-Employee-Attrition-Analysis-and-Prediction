@@ -1,6 +1,8 @@
 data/raw/*
 data/processed/*
 
+reports/figures/*
+
 __pycache__/
 .ipynb_checkpoints/
 
