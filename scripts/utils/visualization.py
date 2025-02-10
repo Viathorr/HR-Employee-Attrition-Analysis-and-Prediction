@@ -16,7 +16,7 @@ def save_figure(fig: matplotlib.figure.Figure, filename: str, dirname: str):
     dirname (str): Name of the directory to save the figure in. 
 
   Returns:
-    None
+    None: The figure is saved to the specified folder.
   """
   folder = os.path.join(FIGS_DIR, dirname)
   
@@ -46,7 +46,7 @@ def cat_distribution(df: pd.DataFrame, col_name: str, ax: plt.Axes, ratio: bool 
     raise ValueError(f"Column '{col_name}' not found in DataFrame.")
   
   if ratio:
-    print(f"\n\n📌Ratio of unique values in '{col_name}':")
+    print(f"\n\n📌 Ratio of unique values in '{col_name}':")
     print(pd.DataFrame(df[col_name].value_counts(normalize=True) * 100).rename(columns={"proportion": "Ratio (%)"}).sort_values("Ratio (%)", ascending=False))
     print("-" * 50)
   
@@ -59,21 +59,25 @@ def cat_distribution(df: pd.DataFrame, col_name: str, ax: plt.Axes, ratio: bool 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
   
   
-def num_distribution(df: pd.DataFrame, col_name: str):
+def num_distribution(df: pd.DataFrame, col_name: str, ax: plt.Axes, hue: str = None) -> None:
   """
   Visualizes the distribution of a numerical column in a given DataFrame.
 
   Args:
     df (pandas.DataFrame): DataFrame containing the column to visualize.
     col_name (str): Name of the column to visualize.
+    ax (matplotlib.axes.Axes): Axes object to draw the plot.
+    hue (str, optional): Name of the column to color the plot by. Default is None.
 
   Returns:
-    matplotlib.figure.Figure: Figure object containing the distribution plot.
+    None: Plot is drawn directly on the provided axes object.
   """
   if col_name not in df.columns:
     raise ValueError(f"Column '{col_name}' not found in DataFrame.")
   
-  # TBA
+  sns.histplot(data=df, x=col_name, kde=True, bins=30, ax=ax, hue=hue, palette="Set2")
+  ax.set_title(f"Distribution of '{col_name}'{' by ' + hue if hue else ''}")
+  ax.set_xlabel(f"'{col_name}'")
   
 
 # Feature-Target Relationships
@@ -114,17 +118,18 @@ def target_by_cat(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes
     bar_plot.bar_label(container, fmt="%.1f%%", label_type="center")
 
 
-def target_by_num(df: pd.DataFrame, target_col: str, col_name: str):
+def target_by_num(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes):
   """
-  Visualizes the target distribution by a numerical column in a given DataFrame.
+  Visualizes violin plot of the numerical feature by the categorical target feature in a given DataFrame.
 
   Args:
     df (pandas.DataFrame): DataFrame containing the columns to visualize.
     target_col (str): Name of the target column.
     col_name (str): Name of the numerical column.
+    ax (matplotlib.axes.Axes): Axes object to draw the plot.
 
   Returns:
-    matplotlib.figure.Figure: Figure object containing the relationship plot.
+    None: Plot is drawn directly on the provided axes object.
   """
   if col_name not in df.columns:
     raise ValueError(f"Column '{col_name}' not found in DataFrame.")
@@ -132,27 +137,23 @@ def target_by_num(df: pd.DataFrame, target_col: str, col_name: str):
   if target_col not in df.columns:
     raise ValueError(f"Column '{target_col}' not found in DataFrame.")
   
-  fig = plt.figure(figsize=(10, 5))
+  sns.violinplot(data=df, x=target_col, y=col_name, palette="Set1", ax=ax)
   
-  sns.stripplot(data=df, x=target_col, y=col_name, palette="Set3")
-  
-  plt.title(f"Target ({target_col}) Distribution by {col_name}.")
-  plt.xlabel(f"{target_col}")
-  plt.ylabel(f"{col_name}")
-  
-  plt.show()
-  
-  return fig
+  ax.set_title(f"Target ({target_col}) Distribution by {col_name}.")
 
   
-def plot_dual_distributions(df: pd.DataFrame, target_col: str, col_name: str, ratio: bool = True) -> None:
+def plot_cat_analysis(df: pd.DataFrame, col_name: str, target_col: str = None, ratio: bool = True) -> None:
   """
-  Combines the 'target_by_cat' and 'cat_distribution' plots into a single figure with two subplots.
+  Analyzes and visualizes a categorical feature of a given DataFrame.
+
+  The function combines the following two plots into a single figure with two subplots:
+  1. Distribution of the categorical feature.
+  2. Target distribution by the categorical feature (if target_col is provided).
 
   Args:
     df (pandas.DataFrame): DataFrame containing the columns to visualize.
-    target_col (str): Name of the target column.
     col_name (str): Name of the categorical column.
+    target_col (str, optional): Name of the target column. Default is None.
     ratio (bool, optional): If True, displays the ratio of unique values in the column. Default is True.
 
   Returns:
@@ -162,7 +163,7 @@ def plot_dual_distributions(df: pd.DataFrame, target_col: str, col_name: str, ra
   
   cat_distribution(df, col_name, axes[0], ratio)
   
-  if col_name != target_col:
+  if target_col and col_name != target_col:
     target_by_cat(df, target_col, col_name, axes[1])
   else:
     axes[1].set_visible(False)
@@ -170,4 +171,42 @@ def plot_dual_distributions(df: pd.DataFrame, target_col: str, col_name: str, ra
   plt.tight_layout()
   plt.show()
   
+  return fig
+
+
+def plot_num_analysis(df: pd.DataFrame, col_name: str, target_col: str = None, show_mean: bool = True) -> None:
+  """
+  Analyzes and visualizes a numerical feature of a given DataFrame.
+
+  The function combines the following three plots into a single figure with three subplots:
+  1. Distribution of the numerical feature.
+  2. Numerical feature distribution by the categorical target feature (if target_col is provided).
+  3. Violin plot of the numerical feature by the categorical target feature (if target_col is provided).
+
+  Args:
+    df (pandas.DataFrame): DataFrame containing the columns to visualize.
+    col_name (str): Name of the numerical column.
+    target_col (str, optional): Name of the categorical target column. Default is None.
+    show_mean (bool, optional): If True, displays the mean of the numerical column by the target. Default is True.
+
+  Returns:
+    None: Displays the combined figure with both plots.
+  """
+  if show_mean and target_col:
+    mean_by_target = df.groupby(target_col)[col_name].mean()
+    print(f"\n\n📌 Mean of '{col_name}' by '{target_col}':\n{mean_by_target}")
+
+  fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+  num_distribution(df, col_name, ax=axes[0])
+
+  if target_col and col_name != target_col:
+    num_distribution(df, col_name, hue=target_col, ax=axes[1])
+    target_by_num(df, target_col, col_name, ax=axes[2])
+  else:
+    axes[2].set_visible(False)
+
+  plt.tight_layout()
+  plt.show()
+
   return fig
