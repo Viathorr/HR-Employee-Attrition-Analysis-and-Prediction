@@ -219,3 +219,32 @@ def plot_num_analysis(df: pd.DataFrame, col_name: str, target_col: str = None, s
   plt.show()
 
   return fig
+
+
+# Outliers Detection
+def boxplot_by_target(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes = None):
+  """
+  Visualizes the distribution of a numeric column by the target column using a boxplot.
+
+  Args:
+    df (pd.DataFrame): DataFrame containing the data.
+    target_col (str): The target column.
+    col_name (str): The column to visualize.
+    ax (plt.Axes, optional): Matplotlib Axes object to draw the plot on. If None, uses the current Axes.
+
+  Returns:
+    None: The plot is drawn directly on the provided or current Axes.
+  """
+  if col_name not in df.columns:
+    raise ValueError(f"Column '{col_name}' not found in DataFrame.")
+  
+  if target_col not in df.columns:
+    raise ValueError(f"Column '{target_col}' not found in DataFrame.")
+  
+  sns.boxplot(data=df, x=target_col, y=col_name, palette="Set1", whis=2, ax=ax)
+  
+  if ax is not None:
+    ax.set_title(f"Boxplot of '{col_name}' by '{target_col}'")
+  else: 
+    plt.title(f"Boxplot of '{col_name}' by '{target_col}'")
+    plt.show()

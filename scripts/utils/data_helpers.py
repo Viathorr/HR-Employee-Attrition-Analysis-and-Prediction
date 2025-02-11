@@ -7,20 +7,17 @@ def get_cols_names(df: pd.DataFrame, cat_threshold: int = 10, car_threshold: int
   """
   Identify and separate categorical and numerical columns of a given DataFrame.
 
-  Parameters
-  ----------
-  df : pd.DataFrame
-    Input DataFrame.
-  cat_threshold : int, optional
-    Number of unique values below which a column is considered categorical, by default 10.
-  car_threshold : int, optional
-    Number of unique values above which a column is considered categorical but cardinal, by default 20.
+  Args:
+    df (pd.DataFrame): Input DataFrame.
+    cat_threshold (int, optional): Threshold for considering a column as categorical. Default is 10.
+    car_threshold (int, optional): Threshold for considering a column as cardinal. Default is 20.
 
-  Returns
-  -------
-  tuple
-    A tuple containing the categorical columns, numerical columns,
-    numerical columns that are categorical, and categorical columns that are cardinal.
+  Returns:
+    tuple: A tuple containing the following lists:
+      cat_cols (list): List of categorical columns.
+      num_cols (list): List of numerical columns.
+      num_but_cat_cols (list): List of numerical columns that are categorical.
+      cat_but_car_cols (list): List of categorical columns that are cardinal.
   """
   
   cat_cols = df.select_dtypes(include=["object"]).columns.tolist()
@@ -42,16 +39,15 @@ def print_cols_summary(df: pd.DataFrame, cat_cols, num_cols, num_but_cat_cols=No
     """
     Prints a summary of the given DataFrame's columns.
 
-    Parameters
-    ----------
-    cat_cols : list
-        List of categorical columns.
-    num_cols : list
-        List of numerical columns.
-    num_but_cat_cols : list, optional
-        List of numeric-looking categorical columns, by default None.
-    cat_but_car_cols : list, optional
-        List of categorical but cardinal columns, by default None.
+    Args:
+      df (pd.DataFrame): Input DataFrame.
+      cat_cols (list): List of categorical columns.
+      num_cols (list): List of numerical columns.
+      num_but_cat_cols (list, optional): List of numerical columns that are categorical. Default is None.
+      cat_but_car_cols (list, optional): List of categorical columns that are cardinal. Default is None.  
+      
+    Returns:
+      None: Prints the summary of the DataFrame's columns.
     """
     print(f"Categorical columns ({len(cat_cols)}) (including numeric-looking categorical columns): {cat_cols}\n\nFrom them numeric-looking categorical columns ({len(num_but_cat_cols)}): {num_but_cat_cols}\n")
     print("-" * 50)
@@ -61,13 +57,17 @@ def print_cols_summary(df: pd.DataFrame, cat_cols, num_cols, num_but_cat_cols=No
     print("-" * 50)
 
     for col in cat_cols:
-        print(f"\n'{col}' column contains {df[col].nunique()} unique values: {df[col].unique().tolist()}")
+      print(f"\n'{col}' column contains {df[col].nunique()} unique values: {df[col].unique().tolist()}")
 
     print("\n", "-" * 50)
     
     for col in num_cols:
-        print(f"\n'{col}' column contains values in a range from {df.describe().loc['min', col]} to {df.describe().loc['max', col]}")
+      print(f"\n'{col}' column contains values in a range from {df.describe().loc['min', col]} to {df.describe().loc['max', col]}")
 
     print("\n", "-" * 50)
     for col in cat_but_car_cols:
-        print(f"\n'{col}' column contains {df[col].nunique()} unique values.")
+      print(f"\n'{col}' column contains {df[col].nunique()} unique values.")
+        
+        
+        
+        
