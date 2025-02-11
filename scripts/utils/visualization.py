@@ -118,15 +118,16 @@ def target_by_cat(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes
     bar_plot.bar_label(container, fmt="%.1f%%", label_type="center")
 
 
-def target_by_num(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes):
+def target_by_num(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes, kind="bar") -> None:
   """
-  Visualizes violin plot of the numerical feature by the categorical target feature in a given DataFrame.
+  Visualizes the target distribution by a numerical column in a given DataFrame.
 
   Args:
     df (pandas.DataFrame): DataFrame containing the columns to visualize.
     target_col (str): Name of the target column.
     col_name (str): Name of the numerical column.
     ax (matplotlib.axes.Axes): Axes object to draw the plot.
+    kind (str, optional): Type of plot to draw ("violin" or "bar"). Default is "bar".
 
   Returns:
     None: Plot is drawn directly on the provided axes object.
@@ -137,7 +138,13 @@ def target_by_num(df: pd.DataFrame, target_col: str, col_name: str, ax: plt.Axes
   if target_col not in df.columns:
     raise ValueError(f"Column '{target_col}' not found in DataFrame.")
   
-  sns.violinplot(data=df, x=target_col, y=col_name, palette="Set1", ax=ax)
+  if kind == "bar":
+    sns.barplot(data=df, x=target_col, y=col_name, palette="coolwarm", ax=ax)
+    ax.set_ylabel(f"Mean of '{col_name}'")
+  elif kind == "violin":
+    sns.violinplot(data=df, x=target_col, y=col_name, palette="Set1", ax=ax)
+  else:
+    raise ValueError("`kind` must be either 'bar' or 'violin'.")
   
   ax.set_title(f"Target ({target_col}) Distribution by {col_name}.")
 
@@ -196,15 +203,17 @@ def plot_num_analysis(df: pd.DataFrame, col_name: str, target_col: str = None, s
     mean_by_target = df.groupby(target_col)[col_name].mean()
     print(f"\n\n📌 Mean of '{col_name}' by '{target_col}':\n{mean_by_target}")
 
-  fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+  fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 
   num_distribution(df, col_name, ax=axes[0])
 
   if target_col and col_name != target_col:
     num_distribution(df, col_name, hue=target_col, ax=axes[1])
     target_by_num(df, target_col, col_name, ax=axes[2])
+    target_by_num(df, target_col, col_name, ax=axes[3], kind="violin")
   else:
-    axes[2].set_visible(False)
+    for i in range(1, 4):
+      axes[i].set_visible(False)
 
   plt.tight_layout()
   plt.show()
