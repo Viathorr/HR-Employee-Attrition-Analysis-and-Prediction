@@ -8,6 +8,8 @@ reports/figures/*
 __pycache__/
 .ipynb_checkpoints/
 
+notebooks/03_processed_data_analysis.ipynb
+
 *.log
 .env
 *.ipynb_checkpoints
