@@ -9,6 +9,7 @@ __pycache__/
 .ipynb_checkpoints/
 
 notebooks/processed_data_analysis.ipynb
+notebooks/catboost_info
 
 *.log
 .env
