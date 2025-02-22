@@ -1,10 +1,9 @@
 import os
 import joblib
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OrdinalEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
-from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from feature_engineering import FeatureEngineeringTransformer, FeatureRemover
 
