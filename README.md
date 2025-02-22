@@ -26,7 +26,7 @@ Multiple classification models were trained on the dataset, including **_Logisti
 The model's performance was evaluated using the following metrics:
 
 - **Confusion Matrix**: The confusion matrix revealed challenges in accurately predicting the _minority class_ (**attrition**). The model demonstrated a higher accuracy in predicting the _majority class_ (**no attrition**).
-  ![confusion_matrix.png](reports\model_evaluation_figures\log_reg_confusion_matrix.png)
+  ![confusion_matrix.png](reports/model_evaluation_figures/log_reg_confusion_matrix.png)
 
 - **ROC Curve**: _The Area Under the Curve_ (**AUC**) score is **0.80**, indicating a good level of discrimination between the two classes.
-  ![ROC Curve](reports\model_evaluation_figures\log_reg_roc_curve.png)
+  ![ROC Curve](reports/model_evaluation_figures/log_reg_roc_curve.png)
